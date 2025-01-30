@@ -57,7 +57,7 @@ def tourlist():
     tourid = request.form.get('tourid')
     tourgroupid = request.form.get('tourgroupid')
     # Display the list of customers on a tour
-    tourname = ""; # update to get the name of the tour
+    tourname = request.form('tourname')  # update to get the name of the tour
     customerlist = {} # update to get a list of customers on the tour
     return render_template("tourlist.html", tourname = tourname, customerlist = customerlist)
 

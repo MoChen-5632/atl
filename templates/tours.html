@@ -29,7 +29,7 @@
     <input type="hidden" name="tourid" value="{{tourid}}"/>
     <div>
         <label for="tourgroup">Select the tour group to display</label>
-        <select class="form-select" name="tourgroup" id="tourgroup" required>
+        <select class="form-select" name="tourgroupid" id="tourgroupid" required=""> </select>
             <option disabled selected value="">Choose a tour group</option>
             {% for tour in tourgroups %}
                 {{tour}}
