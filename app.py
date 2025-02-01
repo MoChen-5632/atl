@@ -57,9 +57,30 @@ def tourlist():
     tourid = request.form.get('tourid')
     tourgroupid = request.form.get('tourgroupid')
     # Display the list of customers on a tour
-    tourname = request.form('tourname')  # update to get the name of the tour
-    customerlist = {} # update to get a list of customers on the tour
-    return render_template("tourlist.html", tourname = tourname, customerlist = customerlist)
+    cursor = getCursor()
+    # Fetch tour name
+    cursor.execute("SELECT tourname FROM tours WHERE tourid = %s;", (tourid,))
+    tourname_result = cursor.fetchone()
+    tourname = tourname_result["tourname"] if tourname_result else "Unknown Tour"
+
+        # Fetch customers in the tour group, sorted by last name and DOB (youngest first)
+    cursor.execute("""
+        SELECT customerid, firstname, lastname, dob
+        FROM customers
+        WHERE tourgroupid = %s
+        ORDER BY lastname ASC, dob DESC;
+    """, (tourgroupid,))
+
+    customerlist = cursor.fetchall()
+
+    return render_template("tourlist.html", tourname=tourname, customerlist=customerlist)
+
+    # tourname = request.form('tourname')  # update to get the name of the tour
+    # customerlist = {} # update to get a list of customers on the tour
+    # return render_template("tourlist.html", tourname = tourname, customerlist = customerlist)
+
+
+
 
 
 @app.route("/customers")
