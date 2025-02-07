@@ -9,21 +9,23 @@
   </head>
 
   <body>
-    <nav>
-      <h2>Aotearoa Tours Lli.</h2>
-      <table class="table">
-        <tr>      
-          <td><a href="{{url_for('home')}}">Home</a></td>
-          <td><a href="{{url_for('tours')}}">Tours</a></td>
-          <td><a href="{{url_for('customers')}}">Customers</a></td> 
-          <td><a href="{{url_for('tourlist')}}">Tour List</a></td> 
-          <td><a href="{{url_for('makebooking')}}">Add a Booking</a></td>
-          <td><a href="{{url_for('customersearch')}}">Customer Search</a></td> 
-          
-            <!-- New line -->
-        </tr>
-      </table>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <div class="container-fluid justify-content-center">
+        <h2 class="text-center">Aotearoa Tours Ltd.</h2>
+      </div>
     </nav>
+  
+    <div class="container">
+      <table class="table">
+        <tr class="text-center">
+        <td><a href="{{url_for('home')}}">Home</a></td>
+        <td><a href="{{url_for('tourlist')}}">Customer List</a></td> 
+        <td><a href="{{url_for('customersearch')}}">Customer Search</a></td> 
+        <td><a href="{{url_for('addbooking')}}">Add Booking</a></td>
+        <td><a href="{{url_for('addcustomer')}}">Add Customer</a></td>
+      </tr>
+    </table>
+  </body>
           
     <section class="content">
       <header>

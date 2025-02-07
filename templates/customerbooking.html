@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+
+    <h1 class="mb-4">Customer Booking Overview</h1>
+
+    <h3 class="mb-4">{{ customer.firstname }} {{ customer.familyname }}</h3>
+    
+    <p><strong>Total Tour Destinations Booked:</strong> {{ total_destinations }}</p>
+
+    {% if past_bookings or current_bookings or future_bookings %}
+    
+
+        <h4 class="mt-4">Past Bookings</h4>
+        {% if past_bookings %}
+            <table class="table table-striped">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Tour Name</th>
+                        <th>Departure Date</th>
+                        <th>Number of Destinations</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for booking in past_bookings %}
+                    <tr>
+                        <td>{{ booking.tourname }}</td>
+                        <td>{{ booking.startdate }}</td>
+                        <td>{{ booking.num_destinations }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>No past bookings.</p>
+        {% endif %}
+
+
+        <h4 class="mt-4">Current Bookings</h4>
+        {% if current_bookings %}
+            <table class="table table-striped">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Tour Name</th>
+                        <th>Departure Date</th>
+                        <th>Number of Destinations</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for booking in current_bookings %}
+                    <tr>
+                        <td>{{ booking.tourname }}</td>
+                        <td>{{ booking.startdate }}</td>
+                        <td>{{ booking.num_destinations }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>No current bookings.</p>
+        {% endif %}
+
+
+        <h4 class="mt-4">Future Bookings</h4>
+        {% if future_bookings %}
+            <table class="table table-striped">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Tour Name</th>
+                        <th>Departure Date</th>
+                        <th>Number of Destinations</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for booking in future_bookings %}
+                    <tr>
+                        <td>{{ booking.tourname }}</td>
+                        <td>{{ booking.startdate }}</td>
+                        <td>{{ booking.num_destinations }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>No future bookings.</p>
+        {% endif %}
+
+    {% else %}
+        <p>No bookings found for this customer.</p>
+    {% endif %}
+
+
+</div>
+{% endblock %}

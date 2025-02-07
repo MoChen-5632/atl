@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block content %}
+
+
+<div class="container mt-4">
+    <h1>Add Customer</h1>
+    
+    <form action="{{ url_for('addcustomer') }}" method="post" class="needs-validation" novalidate>
+        
+        <div class="mb-3">
+            <label for="firstname" class="form-label">First Name</label>
+            <input type="text" class="form-control" id="firstname" name="firstname" required>
+            <div class="invalid-feedback">First name is required.</div>
+        </div>
+
+        <div class="mb-3">
+            <label for="familyname" class="form-label">Family Name</label>
+            <input type="text" class="form-control" id="familyname" name="familyname" required>
+            <div class="invalid-feedback">Family name is required.</div>
+        </div>
+
+        <div class="mb-3">
+            <label for="dob" class="form-label">Date of Birth</label>
+            <input type="date" class="form-control" id="dob" name="dob" required>
+            <div class="invalid-feedback">Date of birth is required.</div>
+        </div>
+
+        <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" class="form-control" id="email" name="email" required>
+            <div class="invalid-feedback">Please enter a valid email.</div>
+        </div>
+
+        <div class="mb-3">
+            <label for="phone" class="form-label">Phone</label>
+            <input type="tel" class="form-control" id="phone" name="phone" pattern="\d{10,12}" required>
+            <div class="invalid-feedback">Enter a valid phone number (9-14 digits).</div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Add Customer</button>
+    </form>
+</div>
+{% endblock %}
