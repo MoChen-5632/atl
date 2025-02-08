@@ -58,12 +58,12 @@ def tourlist():
     startdate = None
 
     if request.method == "POST":
-        # Get selected tour and tour group from the form
+        # Get selected tour and tourgroup from the form
         tour_id = request.form.get("tour")
         tourgroup_id = request.form.get("tourgroup")
 
         if tour_id:
-            # Fetch tour groups based on the selected tour ID
+            # Fetch tour groups based on the selected tourid
             connection.execute("""
                 SELECT tourgroups.tourgroupid, tourgroups.startdate
                 FROM tourgroups
@@ -73,7 +73,7 @@ def tourlist():
             tourgroups = connection.fetchall()
 
         if tourgroup_id:
-            # Fetch tour name and start date for the selected tour group
+            # Fetch tour name and start date for the selected tourgroup
             connection.execute("""
                 SELECT tours.tourname, tourgroups.startdate
                 FROM tourgroups
@@ -86,7 +86,7 @@ def tourlist():
                 tourname = tour_info['tourname']
                 startdate = tour_info['startdate']
                 
-                # Fetch customers in the selected tour group
+                # Fetch customers in the selected tourgroup
                 connection.execute("""
                     SELECT customers.customerid, customers.firstname, customers.familyname, customers.dob, customers.email, customers.phone
                     FROM tourbookings
@@ -119,10 +119,10 @@ def tourlist():
 
 @app.route("/customersearch", methods=["GET", "POST"])
 def customersearch():
-    connection = getCursor()  # Get database cursor
+    connection = getCursor()  
     
     if request.method == "POST":
-        # Get the search term from the form (both first and family name)
+        # Get the search term from the form 
         search_term = request.form.get("search_term")
 
         # Check if the search term is provided and not empty
@@ -153,7 +153,7 @@ def addbooking():
     connection = getCursor()
     
     if request.method == 'POST':
-        # Retrieve form values from three fields: customer, tour, and tour group.
+        # Retrieve form values from three fields: customer, tour, and tourgroup.
         customerid = request.form.get('customer')
         tourid_selected = request.form.get('tour')
         tourgroupid = request.form.get('tourgroup')
@@ -163,7 +163,7 @@ def addbooking():
             flash("Please select a customer, a tour, and a tour group.")
             return redirect(url_for('addbooking'))
             
-        # 1. Retrieve the selected tour group and verify it exists and is in the future.
+        # 1. Retrieve the selected tourgroup and verify it exists and is in the future.
         query = "SELECT tourid, startdate FROM tourgroups WHERE tourgroupid = %s"
         connection.execute(query, (tourgroupid,))
         tourgroup = connection.fetchone()
@@ -175,12 +175,12 @@ def addbooking():
             flash("You can only book tour groups with a start date in the future.")
             return redirect(url_for('addbooking'))
         
-        # 2. Ensure the tour group belongs to the tour selected.
+        # 2. Ensure the tourgroup belongs to the tour selected.
         if int(tourid_selected) != tourgroup['tourid']:
             flash("The selected tour group does not belong to the chosen tour.")
             return redirect(url_for('addbooking'))
         
-        # 3. Ensure the customer is not already booked for this tour group
+        # 3. Ensure the customer is not already booked for this tourgroup
         query = "SELECT 1 FROM tourbookings WHERE customerid = %s AND tourgroupid = %s"
         connection.execute(query, (customerid, tourgroupid))
         existing_booking = connection.fetchone()
@@ -273,24 +273,21 @@ def addcustomer():
     if not familyname.isalpha():
         flash('Family name must contain letters only')
         dataerror = True
-    if not phone.isdigit():
-        flash('Phone number must contain digits only')
-        dataerror = True
-    if len(phone) < 9 or len(phone) > 14:
-        flash('Phone number must be between 9 and 14 digits')
-        dataerror = True
     if not email or '@' not in email:
         flash('Please enter a valid email address')
         dataerror = True
-    if not dob:  # Validate if dob is entered
+    if not dob: 
         flash('Date of birth is required')
+        dataerror = True
+    dob_date = datetime.strptime(dob, "%Y-%m-%d").date()
+    if dob_date >= datetime.today().date():
+        flash('Date of birth cannot be in the future')
         dataerror = True
 
     # if we have a validation error return to the form
     if dataerror:
         return render_template("customerform.html")    
 
-    # Get DB cursor
     connection = getCursor()
 
     # Insert customer data
@@ -299,7 +296,6 @@ def addcustomer():
         VALUES (%s, %s, %s, %s, %s);
     """, (firstname, familyname, dob, email, phone))
 
-    # Flash success message without a category
     flash("Customer added successfully!")
 
     return redirect("/customers")
@@ -326,6 +322,30 @@ def editcustomer(customerid):
     email = request.form["email"]
     phone = request.form["phone"]
 
+
+    dataerror = False
+    ## server side data validation
+    if not firstname.isalpha():
+        flash('First name must contain letters only')
+        dataerror = True
+    if not familyname.isalpha():
+        flash('Family name must contain letters only')
+        dataerror = True
+    if not email or '@' not in email:
+        flash('Please enter a valid email address')
+        dataerror = True
+    if not dob: 
+        flash('Date of birth is required')
+        dataerror = True
+    dob_date = datetime.strptime(dob, "%Y-%m-%d").date()
+    if dob_date >= datetime.today().date():
+        flash('Date of birth cannot be in the future')
+        dataerror = True
+
+    # if we have a validation error return to the form
+    if dataerror:
+        return render_template("customerform.html")    
+    
     connection.execute("UPDATE customers SET firstname=%s, familyname=%s, dob=%s, email=%s, phone=%s WHERE customerid=%s;",
                        (firstname, familyname, dob, email, phone, customerid))
 
