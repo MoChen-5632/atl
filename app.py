@@ -47,30 +47,22 @@ def customers():
 @app.route("/tours/list", methods=["GET", "POST"])
 def tourlist():
     connection = getCursor()
+    # Fetch all tour groups across all tours
+    connection.execute("""
+        SELECT tourgroups.tourgroupid, tourgroups.startdate, tours.tourname
+        FROM tourgroups
+        JOIN tours ON tourgroups.tourid = tours.tourid
+        ORDER BY tours.tourname, tourgroups.startdate;
+    """)
+    tourgroups = connection.fetchall()
 
-    # Fetch available tours for the dropdown
-    connection.execute("SELECT tourid, tourname, agerestriction FROM tours ORDER BY tourname;")
-    tours = connection.fetchall()
 
-    tourgroups = []
     customers = []
     tourname = None
     startdate = None
 
     if request.method == "POST":
-        # Get selected tour and tourgroup from the form
-        tour_id = request.form.get("tour")
         tourgroup_id = request.form.get("tourgroup")
-
-        if tour_id:
-            # Fetch tour groups based on the selected tourid
-            connection.execute("""
-                SELECT tourgroups.tourgroupid, tourgroups.startdate
-                FROM tourgroups
-                WHERE tourgroups.tourid = %s
-                ORDER BY tourgroups.startdate;
-            """, (tour_id,))
-            tourgroups = connection.fetchall()
 
         if tourgroup_id:
             # Fetch tour name and start date for the selected tourgroup
@@ -80,7 +72,8 @@ def tourlist():
                 JOIN tours ON tourgroups.tourid = tours.tourid
                 WHERE tourgroups.tourgroupid = %s;
             """, (tourgroup_id,))
-            tour_info = connection.fetchone()
+            tour_info = connection.fetchone()      
+
 
             if tour_info:
                 tourname = tour_info['tourname']
@@ -96,20 +89,7 @@ def tourlist():
                 """, (tourgroup_id,))
                 customers = connection.fetchall()
 
-    else:
-        # For GET request, load tour groups for the first available tour
-        if tours:
-            first_tour_id = tours[0]['tourid']
-            connection.execute("""
-                SELECT tourgroups.tourgroupid, tourgroups.startdate
-                FROM tourgroups
-                WHERE tourgroups.tourid = %s
-                ORDER BY tourgroups.startdate;
-            """, (first_tour_id,))
-            tourgroups = connection.fetchall()
-
-    return render_template("tourlist.html", 
-                           tours=tours, 
+    return render_template("tourlist.html",
                            tourgroups=tourgroups, 
                            tourname=tourname, 
                            startdate=startdate, 

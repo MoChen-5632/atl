@@ -9,9 +9,9 @@
   <form method="post" novalidate>
 
     <!-- #1, select customer -->
-    <div class="form-group">
+    <div class="form-group mb-3">
       <label for="customer">Customer</label>
-      <select class="form-control" id="customer" name="customer" required>
+      <select class="form-control mt-2" id="customer" name="customer" required>
         <option value="">Select a customer</option>
         {% for customer in customers %}
           <option value="{{ customer.customerid }}">
@@ -22,9 +22,9 @@
     </div>
       
     <!-- #2, select tour -->
-    <div class="form-group">
+    <div class="form-group mb-3">
       <label for="tour">Tour</label>
-      <select class="form-control" id="tour" name="tour" required>
+      <select class="form-control mt-2" id="tour" name="tour" required>
         <option value="">Select a tour</option>
         {% for tour in tours %}
           <option value="{{ tour.tourid }}">
@@ -35,9 +35,9 @@
     </div>
 
     <!-- #3, select tourgroup -->
-    <div class="form-group">
+    <div class="form-group mb-3">
       <label for="tourgroup">Tour Group</label>
-      <select class="form-control" id="tourgroup" name="tourgroup" required>
+      <select class="form-control mt-2" id="tourgroup" name="tourgroup" required>
         <option value="">Select a tour group</option>
         {% for group in tourgroups %}
           <option value="{{ group.tourgroupid }}">

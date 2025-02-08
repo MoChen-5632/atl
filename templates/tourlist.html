@@ -8,40 +8,29 @@
     <h1>Customer List</h1>
     
     <form method="POST" class="mb-4">
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                <label for="tour" class="form-label">Select Tour:</label>
-                <select id="tour" name="tour" class="form-select" onchange="this.form.submit()">
-                    <option value="">-- Select Tour --</option>
-                    {% for tour in tours %}
-                        <option value="{{ tour.tourid }}" {% if tour.tourid == request.form.get('tour') %}selected{% endif %}>
-                            {{ tour.tourname }}
-                        </option>
-                    {% endfor %}
-                </select>
-            </div>
-            
-            <div class="col-md-6 mb-3">
-                <label for="tourgroup" class="form-label">Select Tour Group:</label>
-                <select id="tourgroup" name="tourgroup" class="form-select" onchange="this.form.submit()">
-                    <option value="">-- Select Tour Group --</option>
-                    {% for tourgroup in tourgroups %}
-                        <option value="{{ tourgroup.tourgroupid }}" {% if tourgroup.tourgroupid == request.form.get('tourgroup') %}selected{% endif %}>
-                            {{ tourgroup.startdate }}
-                        </option>
-                    {% endfor %}
-                </select>
-            </div>
-        </div>
+      <!-- Tour Group Selection -->
+      <div class="form-group mb-3">
+        <label for="tourgroup">Tour Group</label>
+        <select class="form-control mt-2" id="tourgroup" name="tourgroup" required>
+          <option value="">Select a tour group</option>
+          {% for group in tourgroups %}
+            <option value="{{ group.tourgroupid }}">
+              {{ group.tourname }} – Starting on {{ group.startdate }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+        <button type="submit" class="btn btn-primary">View Customers</button>
     </form>
 
+
     {% if tourname and startdate %}
-        <div class="alert alert-info">
+        <div>
             <p><strong>Tour:</strong> {{ tourname }}</p>
             <p><strong>Start Date:</strong> {{ startdate }}</p>
         </div>
     {% else %}
-        <div class="alert alert-warning">
+        <div>
             <p>Select a tour group to view details.</p>
         </div>
     {% endif %}
@@ -86,7 +75,7 @@
             </table>
         </div>
     {% else %}
-        <div class="alert alert-danger">
+        <div>
             <p>No customers found for this tour.</p>
         </div>
     {% endif %}
