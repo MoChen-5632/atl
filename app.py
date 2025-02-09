@@ -119,10 +119,13 @@ def customersearch():
             connection.execute(qstr, (search_term_wildcard, search_term_wildcard))
             customers = connection.fetchall()  # Fetch matching customers
             
+            if not customers:
+                flash("No customers found for the search term")            
             return render_template("customersearch.html", customers=customers)
         else:
             # If no search term is provided, display a message
-            return render_template("customersearch.html", error="Please enter a search term.")
+            flash("Please enter a search term.")
+            return render_template("customersearch.html", customers=None)
     
     return render_template("customersearch.html", customers=None)
 
@@ -237,6 +240,7 @@ def addbooking():
 def addcustomer():
     if request.method == "GET":
         return render_template("customerform.html")
+    
     print (request.form)
     # get information from the form
     firstname = request.form.get("firstname")
@@ -256,17 +260,31 @@ def addcustomer():
     if not email or '@' not in email:
         flash('Please enter a valid email address')
         dataerror = True
-    if not dob: 
-        flash('Date of birth is required')
-        dataerror = True
-    dob_date = datetime.strptime(dob, "%Y-%m-%d").date()
-    if dob_date >= datetime.today().date():
-        flash('Date of birth cannot be in the future')
-        dataerror = True
+    if dob:
+        try:
+            dob_date = datetime.strptime(dob, "%Y-%m-%d").date()
+            # Check if the date of birth is in the future
+            if dob_date >= datetime.today().date():
+                flash('Date of birth cannot be in the future')
+                dataerror = True
+        except ValueError:
+            # Handle the case where the date format is invalid
+            flash('Invalid date format for Date of Birth')
+            dataerror = True
 
+    if phone:
+        if not phone.isdigit():
+            flash('Phone number must contain only digits')
+            dataerror = True
+        elif len(phone) < 8 or len(phone) > 14:
+            flash('Phone number must be between 8 and 14 digits')
+            dataerror = True
+    else:
+        phone = None
+        
     # if we have a validation error return to the form
     if dataerror:
-        return render_template("customerform.html")    
+        return render_template("customerform.html", request=request)      
 
     connection = getCursor()
 
@@ -278,7 +296,7 @@ def addcustomer():
 
     flash("Customer added successfully!")
 
-    return redirect("/customers")
+    return redirect(url_for("customers"))
 
 
 
@@ -286,13 +304,14 @@ def addcustomer():
 def editcustomer(customerid):
     connection = getCursor()
 
+    # Fetch customer data first to ensure `customer` is always defined
+    connection.execute("SELECT * FROM customers WHERE customerid = %s;", (customerid,))
+    customer = connection.fetchone()
+
+    if not customer:
+        return "Customer not found", 404  # Ensure a valid customer exists
+
     if request.method == "GET":
-        connection.execute("SELECT * FROM customers WHERE customerid = %s;", (customerid,))
-        customer = connection.fetchone()
-
-        if not customer:
-            return "Customer not found", 404
-
         return render_template("customeredit.html", customer=customer)
 
     # If form is submitted (POST request)
@@ -314,20 +333,36 @@ def editcustomer(customerid):
     if not email or '@' not in email:
         flash('Please enter a valid email address')
         dataerror = True
-    if not dob: 
-        flash('Date of birth is required')
-        dataerror = True
-    dob_date = datetime.strptime(dob, "%Y-%m-%d").date()
-    if dob_date >= datetime.today().date():
-        flash('Date of birth cannot be in the future')
-        dataerror = True
+    if dob:
+        try:
+            dob_date = datetime.strptime(dob, "%Y-%m-%d").date()
+            # Check if the date of birth is in the future
+            if dob_date >= datetime.today().date():
+                flash('Date of birth cannot be in the future')
+                dataerror = True
+        except ValueError:
+            # Handle the case where the date format is invalid
+            flash('Invalid date format for Date of Birth')
+            dataerror = True
 
+    if phone:
+        if not phone.isdigit():
+            flash('Phone number must contain only digits')
+            dataerror = True
+        elif len(phone) < 8 or len(phone) > 14:
+            flash('Phone number must be between 8 and 14 digits')
+            dataerror = True
+    else:
+        phone = None
+        
     # if we have a validation error return to the form
     if dataerror:
-        return render_template("customerform.html")    
+        return render_template("customeredit.html", customer=customer)   
     
-    connection.execute("UPDATE customers SET firstname=%s, familyname=%s, dob=%s, email=%s, phone=%s WHERE customerid=%s;",
-                       (firstname, familyname, dob, email, phone, customerid))
+    connection.execute("""
+        INSERT INTO customers (firstname, familyname, dob, email, phone)
+        VALUES (%s, %s, %s, %s, %s);
+    """, (firstname, familyname, dob, email, phone))  
 
     return redirect(url_for("customers"))
 
